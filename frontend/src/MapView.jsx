@@ -10,7 +10,7 @@ const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
  * onClick fires with (lat, lon) so the caller can simulate a location
  * update for the selected vehicle, same interaction northstar's map had.
  */
-export default function MapView({ fences, vehicles, onClick, height = 420 }) {
+export default function MapView({ fences, vehicles, draft = [], onClick, height = 420 }) {
   const el = useRef(), map = useRef(), fitted = useRef(false);
   const layer = useRef({});
   const click = useRef(onClick);
@@ -24,7 +24,7 @@ export default function MapView({ fences, vehicles, onClick, height = 420 }) {
       className: "dhruva-dark-tiles",
       attribution: "© OpenStreetMap contributors",
     }).addTo(m);
-    ["fences", "vehicles"].forEach((k) => (layer.current[k] = L.layerGroup().addTo(m)));
+    ["fences", "vehicles", "draft"].forEach((k) => (layer.current[k] = L.layerGroup().addTo(m)));
     m.on("click", (e) => click.current?.(+e.latlng.lat.toFixed(6), +e.latlng.lng.toFixed(6)));
     map.current = m;
     const ro = new ResizeObserver(() => m.invalidateSize());
@@ -72,6 +72,21 @@ export default function MapView({ fences, vehicles, onClick, height = 420 }) {
           .addTo(g);
       });
   }, [vehicles]);
+
+  useEffect(() => {
+    if (!map.current) return;
+    const g = layer.current.draft.clearLayers();
+    if (draft.length > 1) L.polyline(draft, { color: "#ffffff", weight: 2, dashArray: "5 5" }).addTo(g);
+    draft.forEach((p, i) =>
+      L.circleMarker(p, {
+        radius: i === 0 ? 7 : 5,
+        color: "#ffffff",
+        weight: 2,
+        fillColor: i === 0 ? "#c6ff5e" : "#ff8a3d",
+        fillOpacity: 1,
+      }).addTo(g)
+    );
+  }, [draft]);
 
   return <div ref={el} style={{ height, borderRadius: "var(--radius-md)" }} className="leaflet-shell" />;
 }

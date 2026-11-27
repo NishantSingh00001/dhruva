@@ -39,8 +39,13 @@ export const api = {
   fences: async () => (await get("/geofences"))?.geofences ?? null,
   violations: async () => (await get("/violations/history?limit=20"))?.violations ?? null,
   driverScores: async () => (await get("/drivers/scores?limit=20"))?.scores ?? null,
+  driverScore: (vehicleId) => get(`/drivers/${vehicleId}/score`),
   driverEvents: async (vehicleId) => (await get(`/drivers/${vehicleId}/events?limit=20`))?.events ?? null,
   pushLocation: (vehicleId, lat, lon) =>
     post("/vehicles/location", { vehicle_id: vehicleId, latitude: lat, longitude: lon, timestamp: new Date().toISOString() }),
+  createGeofence: (fence) => post("/geofences", fence),
+  createVehicle: (vehicle) => post("/vehicles", vehicle),
+  pushTelemetry: (vehicleId, speed, heading) =>
+    post("/telemetry", { vehicle_id: vehicleId, speed_kmh: speed, heading_deg: heading, timestamp: new Date().toISOString() }),
   base: BASE,
 };
