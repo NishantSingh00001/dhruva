@@ -1,0 +1,30 @@
+name: gosum-tidy
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - feat/driver-behavior-live-demo
+    paths:
+      - .github/workflows/gosum-tidy.yml
+jobs:
+  tidy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - run: go mod tidy
+      - name: print go.mod for retrieval
+        run: |
+          echo "===GO_MOD_BEGIN==="
+          cat go.mod
+          echo "===GO_MOD_END==="
+      - name: print go.sum for retrieval
+        run: |
+          echo "===GO_SUM_BEGIN==="
+          cat go.sum
+          echo "===GO_SUM_END==="
