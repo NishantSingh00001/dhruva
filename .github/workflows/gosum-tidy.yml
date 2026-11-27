@@ -1,6 +1,11 @@
 name: gosum-tidy
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - feat/driver-behavior-live-demo
+    paths:
+      - .github/workflows/gosum-tidy.yml
 jobs:
   tidy:
     runs-on: ubuntu-latest
